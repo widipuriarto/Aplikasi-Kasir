@@ -1,0 +1,750 @@
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.view.JasperViewer;
+
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+
+/**
+ *
+ * @author ASUS
+ */
+public class FormLaporanLabaRugi extends javax.swing.JFrame {
+    
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FormLaporanLabaRugi.class.getName());
+    
+    public Statement st;
+    public ResultSet rs;
+    Connection conn = koneksi.Koneksi.BukaKoneksi();
+    
+    private int idUserLogin;
+    private String namaUser;
+    private String role;
+
+    /**
+     * Creates new form FormLaporanLabaRugi
+     */
+    public FormLaporanLabaRugi(String namaUser, int idUserLogin, String role) {
+        initComponents();
+        
+        this.idUserLogin = idUserLogin;
+        this.namaUser = namaUser;
+        this.role = role;
+        tampilkanStatistikAwal();
+    }
+
+    private FormLaporanLabaRugi() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    private void tampilkanStatistikAwal() {
+        try {
+            Statement st = conn.createStatement();
+
+            // Ambil saldo awal bulan Juni 2025
+            int saldoAwal = 0;
+            ResultSet rs = st.executeQuery("SELECT saldo_awal FROM saldo_bulanan WHERE bulan = '2025-06'");
+            if (rs.next()) {
+                saldoAwal = rs.getInt("saldo_awal");
+            }
+
+            // Hitung income dari Mei 2025 sampai sekarang
+            ResultSet rsIncome = st.executeQuery("SELECT SUM(subtotal) AS total FROM transaksi WHERE tanggal >= '2025-05-01'");
+            int income = 0;
+            if (rsIncome.next()) {
+                income = rsIncome.getInt("total");
+            }
+
+            ResultSet rsOutcome = st.executeQuery("SELECT SUM(totalHarga) AS total FROM pembelian WHERE tanggal >= '2025-05-01'");
+            int outcome = 0;
+            if (rsOutcome.next()) {
+                outcome = rsOutcome.getInt("total");
+            }
+
+            int saldoAkhir = saldoAwal + income - outcome;
+            int laba = income - outcome;
+
+            Locale locale = new Locale("in", "ID");
+            NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(locale);
+
+            lblSaldoAwal.setText(formatRupiah.format(saldoAwal));
+            lblTotalIncome.setText(formatRupiah.format(income));
+            lblTotalOutcome.setText(formatRupiah.format(outcome));
+            lblSaldoAkhir.setText(formatRupiah.format(saldoAkhir));
+            lblLaba.setText(formatRupiah.format(laba));
+
+            // Tambahan
+            lblPeriode.setText("Semua Periode");
+
+            // Hitung total pembelian (jumlah baris)
+            ResultSet rsTotalPembelian = st.executeQuery("SELECT COUNT(*) AS total FROM pembelian");
+            if (rsTotalPembelian.next()) {
+                lblTotalPembelian.setText(String.valueOf(rsTotalPembelian.getInt("total")));
+            }
+
+            // Hitung total penjualan (jumlah baris)
+            ResultSet rsTotalPenjualan = st.executeQuery("SELECT COUNT(*) AS total FROM transaksi");
+            if (rsTotalPenjualan.next()) {
+                lblTotalPenjualan.setText(String.valueOf(rsTotalPenjualan.getInt("total")));
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Gagal tampilkan statistik awal: " + e.getMessage());
+        }
+    }
+    
+    // Method untuk mengubah format rupiah menjadi angka int
+    private int parseRupiah(String text) {
+    try {
+        NumberFormat format = NumberFormat.getInstance(new Locale("in", "ID"));
+        Number number = format.parse(text.replace("Rp", "").trim());
+        return number.intValue();
+    } catch (Exception e) {
+        e.printStackTrace();
+        return 0;
+    }
+}
+
+
+
+
+    
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        lblEarning1 = new javax.swing.JLabel();
+        lblEarning2 = new javax.swing.JLabel();
+        lblEarning3 = new javax.swing.JLabel();
+        lblEarning4 = new javax.swing.JLabel();
+        lblEarning5 = new javax.swing.JLabel();
+        lblEarning6 = new javax.swing.JLabel();
+        lblEarning7 = new javax.swing.JLabel();
+        lblEarning8 = new javax.swing.JLabel();
+        lblPeriode = new javax.swing.JLabel();
+        lblTotalIncome = new javax.swing.JLabel();
+        lblTotalOutcome = new javax.swing.JLabel();
+        lblSaldoAkhir = new javax.swing.JLabel();
+        jSeparator3 = new javax.swing.JSeparator();
+        dateFrom = new com.toedter.calendar.JDateChooser();
+        dateTo = new com.toedter.calendar.JDateChooser();
+        btnFilter = new javax.swing.JButton();
+        jSeparator4 = new javax.swing.JSeparator();
+        btnPrint = new javax.swing.JButton();
+        btnBack = new javax.swing.JButton();
+        btnClear = new javax.swing.JButton();
+        lblEarning9 = new javax.swing.JLabel();
+        lblEarning10 = new javax.swing.JLabel();
+        lblLaba = new javax.swing.JLabel();
+        lblEarning11 = new javax.swing.JLabel();
+        lblEarning12 = new javax.swing.JLabel();
+        lblEarning13 = new javax.swing.JLabel();
+        lblEarning14 = new javax.swing.JLabel();
+        lblEarning15 = new javax.swing.JLabel();
+        lblEarning16 = new javax.swing.JLabel();
+        lblSaldoAwal = new javax.swing.JLabel();
+        lblTotalPembelian = new javax.swing.JLabel();
+        lblTotalPenjualan = new javax.swing.JLabel();
+        jSeparator5 = new javax.swing.JSeparator();
+        jLabel2 = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jPanel2.setBackground(new java.awt.Color(0, 153, 153));
+
+        jLabel1.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel1.setFont(new java.awt.Font("Tw Cen MT", 1, 30)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Report");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(349, 349, 349)
+                .addComponent(jLabel1)
+                .addContainerGap(349, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addComponent(jLabel1)
+                .addContainerGap(24, Short.MAX_VALUE))
+        );
+
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 780, 80));
+
+        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
+
+        lblEarning1.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning1.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning1.setText("Total Outcome");
+
+        lblEarning2.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning2.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning2.setText("Saldo Awal");
+
+        lblEarning3.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning3.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning3.setText("Total Income");
+
+        lblEarning4.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning4.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning4.setText("Saldo Akhir");
+
+        lblEarning5.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning5.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning5.setText(":");
+
+        lblEarning6.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning6.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning6.setText(":");
+
+        lblEarning7.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning7.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning7.setText(":");
+
+        lblEarning8.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning8.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning8.setText(":");
+
+        lblPeriode.setFont(new java.awt.Font("Tw Cen MT", 1, 20)); // NOI18N
+        lblPeriode.setForeground(new java.awt.Color(0, 153, 153));
+        lblPeriode.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPeriode.setText("!");
+
+        lblTotalIncome.setFont(new java.awt.Font("Tw Cen MT", 2, 20)); // NOI18N
+        lblTotalIncome.setForeground(new java.awt.Color(0, 153, 153));
+        lblTotalIncome.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTotalIncome.setText("!");
+
+        lblTotalOutcome.setFont(new java.awt.Font("Tw Cen MT", 2, 20)); // NOI18N
+        lblTotalOutcome.setForeground(new java.awt.Color(0, 153, 153));
+        lblTotalOutcome.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTotalOutcome.setText("!");
+
+        lblSaldoAkhir.setFont(new java.awt.Font("Tw Cen MT", 1, 20)); // NOI18N
+        lblSaldoAkhir.setForeground(new java.awt.Color(0, 153, 153));
+        lblSaldoAkhir.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblSaldoAkhir.setText("!");
+
+        btnFilter.setBackground(new java.awt.Color(0, 153, 153));
+        btnFilter.setFont(new java.awt.Font("Tw Cen MT", 0, 14)); // NOI18N
+        btnFilter.setForeground(new java.awt.Color(255, 255, 255));
+        btnFilter.setText("Filter");
+        btnFilter.setBorder(null);
+        btnFilter.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFilterActionPerformed(evt);
+            }
+        });
+
+        btnPrint.setBackground(new java.awt.Color(0, 153, 153));
+        btnPrint.setFont(new java.awt.Font("Tw Cen MT", 0, 14)); // NOI18N
+        btnPrint.setForeground(new java.awt.Color(255, 255, 255));
+        btnPrint.setText("Print");
+        btnPrint.setBorder(null);
+        btnPrint.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnPrint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrintActionPerformed(evt);
+            }
+        });
+
+        btnBack.setBackground(new java.awt.Color(0, 153, 153));
+        btnBack.setFont(new java.awt.Font("Tw Cen MT", 0, 14)); // NOI18N
+        btnBack.setForeground(new java.awt.Color(255, 255, 255));
+        btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+
+        btnClear.setBackground(new java.awt.Color(0, 153, 153));
+        btnClear.setFont(new java.awt.Font("Tw Cen MT", 0, 14)); // NOI18N
+        btnClear.setForeground(new java.awt.Color(255, 255, 255));
+        btnClear.setText("Clear");
+        btnClear.setBorder(null);
+        btnClear.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
+
+        lblEarning9.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning9.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning9.setText("Laba");
+
+        lblEarning10.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning10.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning10.setText(":");
+
+        lblLaba.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblLaba.setForeground(new java.awt.Color(0, 153, 153));
+        lblLaba.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblLaba.setText("!");
+
+        lblEarning11.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning11.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning11.setText("Periode");
+
+        lblEarning12.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning12.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning12.setText("Total Pembelian");
+
+        lblEarning13.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning13.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning13.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning13.setText(":");
+
+        lblEarning14.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning14.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning14.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning14.setText(":");
+
+        lblEarning15.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning15.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning15.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning15.setText("Total Penjualan");
+
+        lblEarning16.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblEarning16.setForeground(new java.awt.Color(0, 153, 153));
+        lblEarning16.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEarning16.setText(":");
+
+        lblSaldoAwal.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblSaldoAwal.setForeground(new java.awt.Color(0, 153, 153));
+        lblSaldoAwal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblSaldoAwal.setText("!");
+
+        lblTotalPembelian.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblTotalPembelian.setForeground(new java.awt.Color(0, 153, 153));
+        lblTotalPembelian.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTotalPembelian.setText("!");
+
+        lblTotalPenjualan.setFont(new java.awt.Font("Tw Cen MT", 0, 20)); // NOI18N
+        lblTotalPenjualan.setForeground(new java.awt.Color(0, 153, 153));
+        lblTotalPenjualan.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTotalPenjualan.setText("!");
+
+        jLabel2.setFont(new java.awt.Font("Tw Cen MT", 0, 16)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(0, 153, 153));
+        jLabel2.setText("Select time range.");
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addGap(67, 67, 67)
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblEarning2)
+                                    .addComponent(lblEarning3)
+                                    .addComponent(lblEarning1)
+                                    .addComponent(dateFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblEarning11)
+                                    .addComponent(lblEarning12)
+                                    .addComponent(jLabel2))
+                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                                        .addGap(26, 26, 26)
+                                        .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(26, 26, 26)
+                                        .addComponent(dateTo, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(btnFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(5, 5, 5))
+                                    .addGroup(jPanel7Layout.createSequentialGroup()
+                                        .addGap(34, 34, 34)
+                                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                                .addComponent(lblEarning7, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(22, 22, 22)
+                                                .addComponent(lblTotalOutcome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                                .addComponent(lblEarning6, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(lblTotalIncome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                                .addComponent(lblEarning13, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(lblPeriode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                                .addComponent(lblEarning5, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(26, 26, 26)
+                                                .addComponent(lblSaldoAwal, javax.swing.GroupLayout.PREFERRED_SIZE, 422, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 9, Short.MAX_VALUE))
+                                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                                .addComponent(lblEarning14, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(lblTotalPembelian, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                                .addComponent(lblEarning16, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(lblTotalPenjualan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
+                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel7Layout.createSequentialGroup()
+                                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(lblEarning9, javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                                .addComponent(lblEarning4)
+                                                .addGap(90, 90, 90)))
+                                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                                                .addComponent(lblEarning8, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18))
+                                            .addGroup(jPanel7Layout.createSequentialGroup()
+                                                .addComponent(lblEarning10, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)))
+                                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                            .addComponent(lblLaba, javax.swing.GroupLayout.DEFAULT_SIZE, 439, Short.MAX_VALUE)
+                                            .addComponent(lblSaldoAkhir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addComponent(lblEarning15)
+                                    .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 653, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 653, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE))))
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(8, 8, 8)))
+                .addGap(51, 51, 51))
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addGap(25, 25, 25)
+                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(dateFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(dateTo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(30, 30, 30)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblEarning11)
+                    .addComponent(lblEarning13)
+                    .addComponent(lblPeriode))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblEarning12)
+                    .addComponent(lblEarning14)
+                    .addComponent(lblTotalPembelian))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblEarning15)
+                    .addComponent(lblEarning16)
+                    .addComponent(lblTotalPenjualan))
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(3, 3, 3)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblEarning2)
+                    .addComponent(lblEarning5)
+                    .addComponent(lblSaldoAwal))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblEarning3)
+                    .addComponent(lblEarning6)
+                    .addComponent(lblTotalIncome))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblEarning7)
+                    .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lblEarning1)
+                        .addComponent(lblTotalOutcome)))
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblEarning4)
+                    .addComponent(lblEarning8)
+                    .addComponent(lblSaldoAkhir))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblEarning9)
+                    .addComponent(lblEarning10)
+                    .addComponent(lblLaba))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 51, Short.MAX_VALUE)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(56, 56, 56))
+        );
+
+        getContentPane().add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 79, 780, 590));
+
+        setSize(new java.awt.Dimension(793, 674));
+        setLocationRelativeTo(null);
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
+        // TODO add your handling code here:
+         try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String tglFrom = sdf.format(dateFrom.getDate());
+            String tglTo = sdf.format(dateTo.getDate());
+
+            // Ambil bulan dari tanggal FROM (format: YYYY-MM)
+            String bulanDipilih = tglFrom.substring(0, 7);
+
+            // Ambil bulan sebelumnya
+            LocalDate bulanSebelumnya = LocalDate.parse(bulanDipilih + "-01").minusMonths(1);
+            String bulanPrev = bulanSebelumnya.toString().substring(0, 7);
+
+            Statement st = conn.createStatement();
+
+            int saldoAwal = 0;
+
+            // Cek saldo awal bulan ini
+            ResultSet rsSaldoAwal = st.executeQuery("SELECT saldo_awal FROM saldo_bulanan WHERE bulan = '" + bulanDipilih + "'");
+            if (rsSaldoAwal.next()) {
+                saldoAwal = rsSaldoAwal.getInt("saldo_awal");
+            } else {
+                // Ambil saldo akhir bulan sebelumnya sebagai saldo awal
+                ResultSet rsSaldoPrev = st.executeQuery("SELECT saldo_akhir FROM saldo_bulanan WHERE bulan = '" + bulanPrev + "'");
+                if (rsSaldoPrev.next()) {
+                    saldoAwal = rsSaldoPrev.getInt("saldo_akhir");
+                    // Tambahkan ke saldo_bulanan
+                    st.executeUpdate("INSERT INTO saldo_bulanan (bulan, saldo_awal) VALUES ('" + bulanDipilih + "', " + saldoAwal + ")");
+                }
+            }
+
+            // Hitung income
+            ResultSet rsIncome = st.executeQuery("SELECT SUM(subtotal) AS total FROM transaksi WHERE tanggal BETWEEN '" + tglFrom + "' AND '" + tglTo + "'");
+            int income = 0;
+            if (rsIncome.next()) {
+                income = rsIncome.getInt("total");
+            }
+
+            // Hitung outcome
+            ResultSet rsOutcome = st.executeQuery("SELECT SUM(totalHarga) AS total FROM pembelian WHERE tanggal BETWEEN '" + tglFrom + "' AND '" + tglTo + "'");
+            int outcome = 0;
+            if (rsOutcome.next()) {
+                outcome = rsOutcome.getInt("total");
+            }
+
+            int saldoAkhir = saldoAwal + income - outcome;
+            int laba = income - outcome;
+
+            Locale locale = new Locale("in", "ID");
+            NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(locale);
+
+            lblSaldoAwal.setText(formatRupiah.format(saldoAwal));
+            lblTotalIncome.setText(formatRupiah.format(income));
+            lblTotalOutcome.setText(formatRupiah.format(outcome));
+            lblSaldoAkhir.setText(formatRupiah.format(saldoAkhir));
+            lblLaba.setText(formatRupiah.format(laba));
+
+            // Tampilkan periode
+            SimpleDateFormat sdfPeriode = new SimpleDateFormat("MMMM yyyy", new Locale("in", "ID"));
+            String namaBulan = sdfPeriode.format(dateFrom.getDate()) + " - " + sdfPeriode.format(dateTo.getDate());
+            lblPeriode.setText(namaBulan);
+
+            // Hitung jumlah pembelian dalam rentang waktu
+            ResultSet rsTotalPembelian = st.executeQuery("SELECT COUNT(*) AS total FROM pembelian WHERE tanggal BETWEEN '" + tglFrom + "' AND '" + tglTo + "'");
+            if (rsTotalPembelian.next()) {
+                lblTotalPembelian.setText(String.valueOf(rsTotalPembelian.getInt("total")));
+            }
+
+            // Hitung jumlah penjualan dalam rentang waktu
+            ResultSet rsTotalPenjualan = st.executeQuery("SELECT COUNT(*) AS total FROM transaksi WHERE tanggal BETWEEN '" + tglFrom + "' AND '" + tglTo + "'");
+            if (rsTotalPenjualan.next()) {
+                lblTotalPenjualan.setText(String.valueOf(rsTotalPenjualan.getInt("total")));
+            }
+
+            // Update saldo akhir
+            st.executeUpdate("UPDATE saldo_bulanan SET saldo_akhir = " + saldoAkhir +
+                             " WHERE bulan = '" + bulanDipilih + "'");
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Gagal memproses laporan: " + e.getMessage());
+        }
+    }//GEN-LAST:event_btnFilterActionPerformed
+
+    private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
+        // TODO add your handling code here:
+        try {
+            // 1. Ambil dan bersihkan nilai dari label
+            
+            int saldoAwal = parseRupiah(lblSaldoAwal.getText());
+            int totalPembelian = Integer.parseInt(lblTotalPembelian.getText());
+            int totalPenjualan = Integer.parseInt(lblTotalPenjualan.getText());
+            int totalIncome = parseRupiah(lblTotalIncome.getText());
+            int totalOutcome = parseRupiah(lblTotalOutcome.getText());
+            int laba = parseRupiah(lblLaba.getText());
+            int saldoAkhir = parseRupiah(lblSaldoAkhir.getText());
+            String periode = lblPeriode.getText();
+            Date tanggalCetak = new Date(); // tanggal hari ini
+
+            // 2. Buat parameter map
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("saldoAwal", saldoAwal);
+            parameters.put("totalPembelian", totalPembelian);
+            parameters.put("totalPenjualan", totalPenjualan);
+            parameters.put("totalIncome", totalIncome);
+            parameters.put("totalOutcome", totalOutcome);
+            parameters.put("laba", laba);
+            parameters.put("saldoAkhir", saldoAkhir);
+            parameters.put("periode", periode);
+            parameters.put("tanggalCetak", tanggalCetak);
+
+            // 3. Ambil file Jasper dari classpath (pastikan file LaporanLabaRugi.jasper sudah ada di folder src)
+            InputStream reportStream = getClass().getResourceAsStream("/LaporanLabaRugi.jasper");
+            if (reportStream == null) {
+                throw new FileNotFoundException("File laporan tidak ditemukan!");
+            }
+
+            // 4. Cetak report
+            JasperPrint print = JasperFillManager.fillReport(reportStream, parameters, new JREmptyDataSource());
+            JasperViewer viewer = new JasperViewer(print, false);
+            viewer.setVisible(true);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Gagal mencetak laporan: " + e.getMessage());
+        }
+    }//GEN-LAST:event_btnPrintActionPerformed
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+        // TODO add your handling code here:
+        new FormAdminDashboard(namaUser, idUserLogin, role).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnBackActionPerformed
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+        // TODO add your handling code here:
+        tampilkanStatistikAwal();
+
+        // Jika kamu juga punya input tanggal di form ini:
+        if (dateFrom != null && dateTo != null) {
+            dateFrom.setDate(null); // hapus tanggal
+            dateTo.setDate(null);
+        }
+    }//GEN-LAST:event_btnClearActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> new FormLaporanLabaRugi().setVisible(true));
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBack;
+    private javax.swing.JButton btnClear;
+    private javax.swing.JButton btnFilter;
+    private javax.swing.JButton btnPrint;
+    private com.toedter.calendar.JDateChooser dateFrom;
+    private com.toedter.calendar.JDateChooser dateTo;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JSeparator jSeparator5;
+    private javax.swing.JLabel lblEarning1;
+    private javax.swing.JLabel lblEarning10;
+    private javax.swing.JLabel lblEarning11;
+    private javax.swing.JLabel lblEarning12;
+    private javax.swing.JLabel lblEarning13;
+    private javax.swing.JLabel lblEarning14;
+    private javax.swing.JLabel lblEarning15;
+    private javax.swing.JLabel lblEarning16;
+    private javax.swing.JLabel lblEarning2;
+    private javax.swing.JLabel lblEarning3;
+    private javax.swing.JLabel lblEarning4;
+    private javax.swing.JLabel lblEarning5;
+    private javax.swing.JLabel lblEarning6;
+    private javax.swing.JLabel lblEarning7;
+    private javax.swing.JLabel lblEarning8;
+    private javax.swing.JLabel lblEarning9;
+    private javax.swing.JLabel lblLaba;
+    private javax.swing.JLabel lblPeriode;
+    private javax.swing.JLabel lblSaldoAkhir;
+    private javax.swing.JLabel lblSaldoAwal;
+    private javax.swing.JLabel lblTotalIncome;
+    private javax.swing.JLabel lblTotalOutcome;
+    private javax.swing.JLabel lblTotalPembelian;
+    private javax.swing.JLabel lblTotalPenjualan;
+    // End of variables declaration//GEN-END:variables
+}
