@@ -52,7 +52,7 @@ public class FormPembelian extends javax.swing.JFrame {
             
             model.addColumn("Date");
             model.addColumn("Transaction ID");
-            model.addColumn("idSupplier");
+            model.addColumn("Supplier ID");
             model.addColumn("Item Code");
             model.addColumn("Total");
             model.addColumn("Buy Price");

@@ -734,7 +734,19 @@ public class FormTransaksi extends javax.swing.JFrame {
             
             String updateStok = "UPDATE barang SET stok = stok - " + quantity + " WHERE kodeBarang = '" + kode + "'";
             st.executeUpdate(updateStok);
+            
+            // Ambil stok terakhir setelah update
+            int stokTerakhir = 0;
+            ResultSet rsStokAkhir = st.executeQuery("SELECT stok FROM barang WHERE kodeBarang = '" + kode + "'");
+            if (rsStokAkhir.next()) {
+                stokTerakhir = rsStokAkhir.getInt("stok");
+            }
 
+            // Catat mutasi stok keluar ke tabel stok_mutasi
+            String insertMutasi = "INSERT INTO stok_mutasi (tanggal, kodeBarang, namaBarang, tipe, jumlah, stokTerakhir) " +
+                                  "VALUES ('" + date + "', " + kode + ", '" + nama + "', 'keluar', " + quantity + ", " + stokTerakhir + ")";
+            st.executeUpdate(insertMutasi);
+            
             Clear();
             TampilData();
             

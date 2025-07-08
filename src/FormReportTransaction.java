@@ -4,7 +4,9 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -106,6 +108,11 @@ public class FormReportTransaction extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         tblTransaction = new javax.swing.JTable();
         btnPrint = new javax.swing.JButton();
+        dateTo = new com.toedter.calendar.JDateChooser();
+        dateFrom = new com.toedter.calendar.JDateChooser();
+        jLabel2 = new javax.swing.JLabel();
+        btnFilter = new javax.swing.JButton();
+        btnClear = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -170,25 +177,72 @@ public class FormReportTransaction extends javax.swing.JFrame {
             }
         });
 
+        jLabel2.setFont(new java.awt.Font("Tw Cen MT", 0, 16)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(0, 153, 153));
+        jLabel2.setText("Select time range.");
+
+        btnFilter.setBackground(new java.awt.Color(0, 153, 153));
+        btnFilter.setFont(new java.awt.Font("Tw Cen MT", 0, 14)); // NOI18N
+        btnFilter.setForeground(new java.awt.Color(255, 255, 255));
+        btnFilter.setText("Filter");
+        btnFilter.setBorder(null);
+        btnFilter.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFilterActionPerformed(evt);
+            }
+        });
+
+        btnClear.setBackground(new java.awt.Color(0, 153, 153));
+        btnClear.setFont(new java.awt.Font("Tw Cen MT", 0, 14)); // NOI18N
+        btnClear.setForeground(new java.awt.Color(255, 255, 255));
+        btnClear.setText("Clear");
+        btnClear.setBorder(null);
+        btnClear.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap(62, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 785, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addComponent(dateFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(64, 64, 64)
+                            .addComponent(dateTo, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(18, 18, 18)
+                            .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 785, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(63, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(36, Short.MAX_VALUE)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(33, 33, 33)
+                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(dateFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dateTo, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 427, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(34, 34, 34)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -215,21 +269,96 @@ public class FormReportTransaction extends javax.swing.JFrame {
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
         // TODO add your handling code here:
-        try {
-            InputStream reportStream = getClass().getResourceAsStream("/LaporanPenjualan.jasper");
-        if (reportStream == null) {
-            throw new FileNotFoundException("File laporan tidak ditemukan!");
-        }
+            try {
+            // Pastikan dateFrom dan dateTo sudah dipilih
+            if (dateFrom.getDate() == null || dateTo.getDate() == null) {
+                JOptionPane.showMessageDialog(this, "Silakan pilih rentang tanggal terlebih dahulu.");
+                return;
+            }
 
-        HashMap<String, Object> parameters = new HashMap<>();
-        JasperPrint print = JasperFillManager.fillReport(reportStream, parameters, conn);
-        JasperViewer viewer = new JasperViewer(print, false);
+            // Format tanggal
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String fromDate = sdf.format(dateFrom.getDate());
+            String toDate = sdf.format(dateTo.getDate());
+
+            // Ambil file laporan dari classpath
+            InputStream reportStream = getClass().getResourceAsStream("/LaporanPenjualan.jasper");
+            if (reportStream == null) {
+                throw new FileNotFoundException("File laporan tidak ditemukan!");
+            }
+
+            // Siapkan parameter
+            HashMap<String, Object> parameters = new HashMap<>();
+            parameters.put("fromDate", fromDate);
+            parameters.put("toDate", toDate);
+
+            // Cetak laporan
+            JasperPrint print = JasperFillManager.fillReport(reportStream, parameters, conn);
+            JasperViewer viewer = new JasperViewer(print, false);
             viewer.setVisible(true);
+
         } catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Gagal mencetak laporan: " + e.getMessage());
         }
     }//GEN-LAST:event_btnPrintActionPerformed
+
+    private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
+        // TODO add your handling code here:
+            try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String fromDate = sdf.format(dateFrom.getDate());
+            String toDate = sdf.format(dateTo.getDate());
+
+            if (dateFrom.getDate() == null || dateTo.getDate() == null) {
+                JOptionPane.showMessageDialog(this, "Silakan pilih rentang tanggal terlebih dahulu.");
+                return;
+            }
+            
+            // Tampilkan periode
+            SimpleDateFormat sdfPeriode = new SimpleDateFormat("MMMM yyyy", new Locale("in", "ID"));
+            String namaBulan = sdfPeriode.format(dateFrom.getDate()) + " - " + sdfPeriode.format(dateTo.getDate());
+            
+            st = conn.createStatement();
+            rs = st.executeQuery("SELECT * FROM transaksi WHERE tanggal BETWEEN '" + fromDate + "' AND '" + toDate + "'");
+
+            DefaultTableModel model = new DefaultTableModel();
+            model.addColumn("Transaction ID");
+            model.addColumn("User ID");
+            model.addColumn("Date");
+            model.addColumn("Item Code");
+            model.addColumn("Item Name");
+            model.addColumn("Price");
+            model.addColumn("Quantity");
+            model.addColumn("Subtotal");
+
+            model.setRowCount(0);
+
+            while(rs.next()) {
+                Object[] data = {
+                    rs.getInt("idTransaksi"),
+                    rs.getInt("idUser"),
+                    rs.getString("tanggal"),
+                    rs.getInt("kodeBarang"),
+                    rs.getString("namaBarang"),
+                    rs.getInt("harga"),
+                    rs.getInt("jumlah"),
+                    rs.getInt("subtotal"),
+                };
+                model.addRow(data);
+            }
+            tblTransaction.setModel(model);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Gagal memfilter data: " + e.getMessage());
+        }
+    }//GEN-LAST:event_btnFilterActionPerformed
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+        // TODO add your handling code here:
+        dateFrom.setDate(null);
+        dateTo.setDate(null);
+        TampilData();
+    }//GEN-LAST:event_btnClearActionPerformed
 
     /**
      * @param args the command line arguments
@@ -258,8 +387,13 @@ public class FormReportTransaction extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
+    private javax.swing.JButton btnClear;
+    private javax.swing.JButton btnFilter;
     private javax.swing.JButton btnPrint;
+    private com.toedter.calendar.JDateChooser dateFrom;
+    private com.toedter.calendar.JDateChooser dateTo;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
